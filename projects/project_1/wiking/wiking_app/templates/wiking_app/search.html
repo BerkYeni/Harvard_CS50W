@@ -1,0 +1,11 @@
+{% extends 'wiking_app/layout.html' %}
+
+{% block body %}
+  <h1>Search Results</h1>
+
+  <ul>
+    {% for entry in search_results %}
+      <li><a href="{% url 'index' %}{{ entry.title }}">{{ entry.title }}</a></li>
+    {% endfor %}
+  </ul>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'wiking_app/layout.html' %}
+
+{% block body %}
+  {% if message %}
+    <h2>{{ message }}</h2>
+  {% endif %}
+
+  <h1>Welcome to Wiking TM</h1>
+  <a href="{% url 'new_entry' %}">New Entry</a>
+
+  <h2>Entries:</h2>
+  <ul>
+    {% for entry in all_entries %}
+      <li><a href="{% url 'index' %}{{ entry.title }}">{{ entry.title }}</a></li>
+    {% endfor %}
+  </ul>
+{% endblock %}

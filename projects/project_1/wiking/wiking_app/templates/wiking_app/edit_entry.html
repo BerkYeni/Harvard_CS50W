@@ -1,0 +1,15 @@
+{% extends 'wiking_app/layout.html' %}
+
+{% block body %}
+
+<form action="" method="post">
+  {% csrf_token %}
+  <h1>Title:</h1>
+  <div>{{ entry_title }}</div>
+
+  <h1>Edit Content:</h1>
+  <textarea name="content" cols="30" rows="10">{{ entry_content }}</textarea>
+
+  <input type="submit" value="Update Entry">
+</form>
+{% endblock %}

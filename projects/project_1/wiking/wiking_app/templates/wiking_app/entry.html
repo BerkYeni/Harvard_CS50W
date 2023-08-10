@@ -1,0 +1,14 @@
+{% extends 'wiking_app/layout.html' %}
+
+{% block body %}
+  <a href="edit_entry">Edit Entry</a>
+
+  <form action="" method="post">
+    {% csrf_token %}
+    <input type="hidden" value="delete_entry" name="delete_entry">
+    <input type="submit" value="Delete Entry">
+  </form>
+
+  <div><h1>{{ entry_title }}</h1></div>
+  <div>{{ entry_content|safe }}</div>
+{% endblock %}

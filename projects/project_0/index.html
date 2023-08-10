@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Googa Seach</title>
+  <style>
+    body {
+      font-size: 16px;
+    }
+
+    .main-search-bar-container {
+      margin: 200px auto 0 auto;
+      max-width: 550px;
+    }
+
+    .main-search-bar {
+      width: 100%;
+      height: 45px;
+      border-radius: 30px;
+      padding: 0 10px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    .main-search-button-container {
+      padding-top: 20px;
+    }
+
+    .main-button {
+      height: 35px;
+      font-size: 14px;
+      margin: 4px 2px;
+      border-radius: 5px;
+    }
+
+    .other-pages-container {
+      display: flex;
+      justify-content: right;
+    }
+
+    a {
+      margin: 10px;
+      /* font-weight: bold; */
+      text-decoration-line: none;
+      color: black;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div class="other-pages-container">
+    <a href="image.html">Images</a>
+    <a href="advanced.html">Advanced</a>
+  </div>
+
+  <form action="https://www.google.com/search">
+    <div class="main-search-bar-container">
+      <input type="text" name="q" class="main-search-bar">
+      <div class="main-search-button-container">
+        <center>
+          <input type="submit" value="Google Search" class="main-button main-search-button">
+          <input type="submit" name="btnI" value="I'm Feeling Lucky" class="main-button main-im-feeling-lucky-button">
+        </center>
+      </div>
+    </div>
+  </form>
+</body>
+</html>
