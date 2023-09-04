@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chronometer</title>
+    <script>
+      function closure() {
+        let counter = 0;
+        function increment() {
+          counter += 1;
+          return counter;
+        }
+        return increment;
+      }
+      const Counter = closure();
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const secondsElement = document.querySelector("#seconds");
+
+        setInterval(() => {
+          secondsElement.textContent = Counter();
+        }, 1000);
+      });
+    </script>
+  </head>
+  <body>
+    <!-- <button onclick="count()">Count!</button> -->
+    <div id="seconds">0</div>
+  </body>
+</html>

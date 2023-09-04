@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Saved Chronometer</title>
+    <script>
+      const localCounter = localStorage.getItem("counter");
+      let counter = localCounter ? Number(localCounter) : 0;
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const counterElement = document.querySelector("#counter");
+        counterElement.textContent = counter;
+
+        setInterval(() => {
+          counter += 1;
+          counterElement.textContent = counter;
+          localStorage.setItem("counter", counter.toString());
+        }, 1000);
+      });
+    </script>
+  </head>
+  <body>
+    <!-- <button onclick="count()">Count!</button> -->
+    <div id="counter"></div>
+  </body>
+</html>

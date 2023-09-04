@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Currency Exchange</title>
+    <script>
+      const fetchData = () => {
+        // i'm gonna skip this part cuz the api wants a key now.
+        //   fetch("https://api.exchangeratesapi.io/latest?base=USD")
+        //     .then((response) => response.json())
+        //     .then((data) => {
+        //       console.log(data);
+        //     });
+
+        const data = {
+          rates: { EUR: 1.244342, TRY: 20.47291, GBP: 0.714917 },
+          base: "USD",
+        };
+
+        const currencySelectElement = document.querySelector("select");
+        const optionElements = Object.keys(data.rates).map((rate) => {
+          const rateElement = document.createElement("option");
+          rateElement.textContent = rate;
+          rateElement.value = rate;
+          return rateElement;
+        });
+        optionElements.forEach((optionElement) => {
+          currencySelectElement.appendChild(optionElement);
+        });
+
+        currencySelectElement.onchange = () => {
+          const rate = data.rates[currencySelectElement.value];
+          document.querySelector(
+            "#display"
+          ).textContent = `1 USD is equal to ${rate.toFixed(2)} ${
+            currencySelectElement.value
+          }.`;
+        };
+
+        const rate = data.rates.EUR;
+        document.querySelector(
+          "#display"
+        ).textContent = `1 USD is equal to ${rate.toFixed(2)} EUR.`;
+      };
+      document.addEventListener("DOMContentLoaded", () => {
+        fetchData();
+      });
+    </script>
+  </head>
+  <body>
+    <select name="currency" id="currency"></select>
+    <span id="display"></span>
+  </body>
+</html>

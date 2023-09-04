@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tasks</title>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // submit button is disabled by default
+        document.querySelector("#submit").disabled = true;
+
+        document.querySelector("#task").onkeyup = () => {
+          const taskContentElement = document.querySelector("#task");
+          const submitButton = document.querySelector("#submit");
+
+          if (taskContentElement.value === "") {
+            submitButton.disabled = true;
+          } else {
+            submitButton.disabled = false;
+          }
+        };
+
+        document.querySelector("form").onsubmit = () => {
+          const taskContentElement = document.querySelector("#task");
+          const taskContent = taskContentElement.value;
+
+          const taskElement = document.createElement("li");
+          taskElement.textContent = taskContent;
+
+          document.querySelector("ul").appendChild(taskElement);
+
+          taskContentElement.value = "";
+
+          document.querySelector("#submit").disabled = true;
+
+          // stop form from submitting
+          return false;
+        };
+      });
+    </script>
+  </head>
+  <body>
+    <h1>Tasks</h1>
+    <ul id="tasks"></ul>
+    <form action="">
+      <input type="text" id="task" placeholder="Enter a new task here" />
+      <input type="submit" id="submit" />
+    </form>
+  </body>
+</html>
