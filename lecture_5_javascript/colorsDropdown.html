@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Colors</title>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const hello = document.querySelector("#hello");
+        function changeHelloColor(color) {
+          hello.style.color = color;
+        }
+
+        // const buttons = document.querySelectorAll("button");
+        // buttons.forEach((button) => {
+        //   button.onclick = () => changeHelloColor(button.dataset.color);
+        // });
+
+        const selectDropdown = document.querySelector("select");
+        selectDropdown.onchange = function () {
+          changeHelloColor(this.value);
+        };
+      });
+    </script>
+  </head>
+  <body>
+    <h1 id="hello">Hello!</h1>
+  </body>
+  <select>
+    <option value="black">Black</option>
+    <option value="red">Red</option>
+    <option value="blue">Blue</option>
+    <option value="green">Green</option>
+  </select>
+</html>

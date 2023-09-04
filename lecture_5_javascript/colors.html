@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Colors</title>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // const hello = document.querySelector("#hello");
+        // document.querySelector("#red").onclick = () => {
+        //   hello.style.color = "red";
+        // };
+        // document.querySelector("#blue").onclick = () => {
+        //   hello.style.color = "blue";
+        // };
+        // document.querySelector("#green").onclick = () => {
+        //   hello.style.color = "green";
+        // };
+
+        const hello = document.querySelector("#hello");
+        function changeHelloColor(color) {
+          hello.style.color = color;
+        }
+
+        const buttons = document.querySelectorAll("button");
+        buttons.forEach((button) => {
+          button.onclick = () => changeHelloColor(button.dataset.color);
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <h1 id="hello">Hello!</h1>
+  </body>
+  <button data-color="red" id="red">Red</button>
+  <button data-color="blue" id="blue">Blue</button>
+  <button data-color="green" id="green">Green</button>
+</html>

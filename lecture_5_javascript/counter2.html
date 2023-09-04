@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Counter 2</title>
+    <script>
+      function closure() {
+        let counter = 0;
+        function increment() {
+          counter += 1;
+          return counter;
+        }
+        return increment;
+      }
+
+      const Counter = closure();
+
+      function count() {
+        const heading = document.querySelector("h1");
+        const countValue = Counter();
+        heading.textContent = countValue;
+        if (Number(heading.textContent) % 10 === 0) {
+          alert(`Counter is now ${countValue}`);
+        }
+      }
+
+      document.addEventListener(
+        "DOMContentLoaded",
+        () => (document.querySelector("button").onclick = count)
+      );
+    </script>
+  </head>
+  <body>
+    <h1>0</h1>
+    <button>Count!</button>
+  </body>
+</html>
