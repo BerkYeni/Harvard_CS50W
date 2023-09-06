@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Single Page</title>
+    <style>
+      div {
+        display: none;
+      }
+    </style>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const site = {
+          pages: {
+            page1: "page1",
+            page2: "page2",
+            page3: "page3",
+          },
+          currentPage: "page1",
+          changePage: function (page) {
+            Object.values(this.pages).forEach((pageId) => {
+              document.querySelector(`#${pageId}`).style.display =
+                pageId === page ? "block" : "none";
+            });
+            this.currentPage = page;
+          },
+        };
+
+        site.changePage(site.pages.page1);
+
+        document.querySelectorAll("button").forEach((buttonElement) => {
+          buttonElement.onclick = function () {
+            site.changePage(this.dataset.page);
+          };
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <button data-page="page1">Page 1</button>
+    <button data-page="page2">Page 2</button>
+    <button data-page="page3">Page 3</button>
+    <div id="page1">
+      <h1>This is page 1.</h1>
+    </div>
+    <div id="page2">
+      <h1>This is page 2.</h1>
+    </div>
+    <div id="page3">
+      <h1>This is page 3.</h1>
+    </div>
+  </body>
+</html>
