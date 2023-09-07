@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Single Page</title>
+    <script>
+      window.onpopstate = function (event) {
+        console.log(event);
+        showPage(event.state.pageNumber);
+      };
+
+      async function showPage(pageNumber) {
+        const rawData = await fetch(`/singlePage1/sections/${pageNumber}`);
+        const content = await rawData.text();
+
+        document.querySelector("#content").innerHTML = content;
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll("button").forEach((buttonElement) => {
+          buttonElement.onclick = function () {
+            const pageNumber = this.dataset.pagenumber;
+            history.pushState(
+              { pageNumber: pageNumber },
+              "",
+              `section${pageNumber}`
+            );
+            showPage(pageNumber);
+          };
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <button data-pagenumber="1">Page 1</button>
+    <button data-pagenumber="2">Page 2</button>
+    <button data-pagenumber="3">Page 3</button>
+    <div id="content"></div>
+  </body>
+</html>
