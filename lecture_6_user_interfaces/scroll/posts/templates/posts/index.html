@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Posts</title>
+    <script>
+      let loadedPostAmount = 0;
+      let pause = false;
+
+      async function loadPosts(start, end) {
+        const rawData = await fetch(`/posts/posts?start=${start}&end=${end}`);
+        const data = await rawData.json();
+
+        const contentElement = document.querySelector("#content");
+        contentElement.append(
+          ...data.data.map((postContent) => {
+            const postElement = document.createElement("div");
+            postElement.textContent = postContent;
+            loadedPostAmount += 1;
+            return postElement;
+          })
+        );
+
+        if (window.innerHeight >= document.body.offsetHeight) {
+          loadPosts(loadedPostAmount, loadedPostAmount + 9);
+        }
+
+        pause = false;
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        document.querySelector("#load").onclick = function () {
+          loadPosts(loadedPostAmount, loadedPostAmount + 9);
+        };
+
+        loadPosts(1, 10);
+
+        window.onscroll = function (event) {
+          if (
+            window.innerHeight + window.scrollY >=
+            document.body.offsetHeight
+          ) {
+            if (!pause) {
+              loadPosts(loadedPostAmount, loadedPostAmount + 9);
+            }
+            pause = true;
+          }
+        };
+      });
+    </script>
+  </head>
+  <body>
+    <button id="load">Load</button>
+    <div id="content"></div>
+  </body>
+</html>
