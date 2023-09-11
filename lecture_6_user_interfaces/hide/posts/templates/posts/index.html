@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Posts</title>
+    <style>
+      .post {
+        background-color: #a8d2f7;
+        border: 1px solid #6683cc;
+        border-radius: 1vmin;
+        margin: 20px auto;
+        padding: 30px 60px;
+        width: 30vw;
+
+        animation-name: hide;
+        animation-duration: 0.5s;
+        animation-fill-mode: forwards;
+        animation-play-state: paused;
+      }
+
+      @keyframes hide {
+        0% {
+          opacity: 100%;
+          margin: 20px auto;
+        }
+        100% {
+          opacity: 0;
+          margin: -50px auto;
+        }
+      }
+
+      #content {
+        width: 100%;
+      }
+
+      .invisible {
+        display: none;
+      }
+
+      .hideButton {
+        float: right;
+      }
+    </style>
+    <script>
+      let loadedPostAmount = 0;
+      let pause = false;
+
+      async function loadPosts(start, end) {
+        const rawData = await fetch(`/posts/posts?start=${start}&end=${end}`);
+        const data = await rawData.json();
+
+        const contentElement = document.querySelector("#content");
+        contentElement.append(
+          ...data.data.map((postContent) => {
+            const postElement = document.createElement("div");
+            postElement.className = "post";
+
+            const postContentElement = document.createElement("span");
+            postContentElement.textContent = postContent;
+            postElement.appendChild(postContentElement);
+
+            const hideButton = document.createElement("button");
+            hideButton.className = "hideButton";
+            hideButton.textContent = "Hide";
+            // hideButton.onclick = function () {
+            //   postElement.classList.add("invisible");
+            // };
+            postElement.appendChild(hideButton);
+
+            loadedPostAmount += 1;
+            return postElement;
+          })
+        );
+
+        if (window.innerHeight >= document.body.offsetHeight) {
+          loadPosts(loadedPostAmount, loadedPostAmount + 9);
+        }
+
+        pause = false;
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        document.querySelector("#load").onclick = function () {
+          loadPosts(loadedPostAmount, loadedPostAmount + 9);
+        };
+
+        loadPosts(1, 10);
+
+        window.onscroll = function (event) {
+          if (
+            window.innerHeight + window.scrollY >=
+            document.body.offsetHeight
+          ) {
+            if (!pause) {
+              loadPosts(loadedPostAmount, loadedPostAmount + 9);
+            }
+            pause = true;
+          }
+        };
+
+        document.addEventListener("click", (event) => {
+          const target = event.target;
+          console.log("fjdksl");
+          if (target.className === "hideButton") {
+            target.parentElement.style.animationPlayState = "running";
+            target.parentElement.addEventListener("animationend", () => {
+              target.parentElement.remove();
+            });
+          }
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <button id="load">Load</button>
+    <div id="content"></div>
+  </body>
+</html>
