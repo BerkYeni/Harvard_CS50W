@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <title>React</title>
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #root {
+        text-align: center;
+        font-family: sans-serif;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .question {
+        font-size: xx-large;
+      }
+
+      .youWon {
+        font-size: xx-large;
+        color: lightgreen;
+      }
+
+      .answerInput {
+        text-align: center;
+      }
+
+      .wrong {
+        color: lightcoral;
+      }
+
+      .correct {
+        color: lightgreen;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      function reducer(previousState, action) {
+        switch (action.type) {
+          case "changeUserAnswer":
+            return {
+              ...previousState,
+              userAnswer: action.answer,
+              previousAnswerWasCorrect: null,
+            };
+
+          case "submitAnswer":
+            if (previousState.gameWon) {
+              return previousState;
+            }
+            const answerWasCorrect =
+              previousState.number1 + previousState.number2 ===
+              Number(previousState.userAnswer);
+
+            if (answerWasCorrect) {
+              const newNumber1 = Math.floor(Math.random() * 10) + 1;
+              const newNumber2 = Math.floor(Math.random() * 10) + 1;
+              const newScore = previousState.score + 1;
+              return {
+                ...previousState,
+                score: newScore,
+                number1: newNumber1,
+                number2: newNumber2,
+                userAnswer: "",
+                previousAnswerWasCorrect: true,
+                gameWon: newScore >= 5 ? true : false,
+              };
+            } else {
+              return {
+                ...previousState,
+                score: previousState.score - 1,
+                previousAnswerWasCorrect: false,
+              };
+            }
+
+          default:
+            console.error("Invalid action type.");
+        }
+      }
+
+      function Question(props) {
+        const correctnessClass =
+          props.wasCorrect === null
+            ? ""
+            : props.wasCorrect
+            ? "correct"
+            : "wrong";
+        return (
+          <div className={`question ${correctnessClass}`}>
+            {props.number1} + {props.number2}
+          </div>
+        );
+      }
+
+      function AnswerInput(props) {
+        return (
+          <input
+            className={"answerInput"}
+            value={props.value}
+            onKeyPress={function (event) {
+              if (event.key === "Enter") {
+                props.onSubmitAnswer();
+              }
+            }}
+            onChange={function (event) {
+              props.onChange(event.target.value);
+            }}
+            type="text"
+            autoFocus={true}
+          />
+        );
+      }
+
+      function Result(props) {
+        return <div>{props.correct ? "Correct!" : "Wrong!"}</div>;
+      }
+
+      function Score(props) {
+        return <div>Score: {props.score}</div>;
+      }
+
+      function GameWon(prop) {
+        return <div className={"youWon"}>You Won!</div>;
+      }
+
+      function App() {
+        const [state, dispatch] = React.useReducer(reducer, {
+          number1: 1,
+          number2: 2,
+          userAnswer: "",
+          score: 0,
+          previousAnswerWasCorrect: null,
+          gameWon: false,
+        });
+
+        const [showResult, setShowResult] = React.useState(false);
+
+        function submitAnswer() {
+          dispatch({ type: "submitAnswer" });
+          setShowResult(true);
+        }
+
+        return (
+          <div className="App">
+            {state.gameWon ? (
+              <GameWon />
+            ) : (
+              <>
+                <Question
+                  wasCorrect={state.previousAnswerWasCorrect}
+                  number1={state.number1}
+                  number2={state.number2}
+                />
+
+                <AnswerInput
+                  onSubmitAnswer={submitAnswer}
+                  value={state.userAnswer}
+                  onChange={(answer) => {
+                    setShowResult(false);
+                    dispatch({ type: "changeUserAnswer", answer: answer });
+                  }}
+                />
+
+                <Score score={state.score} />
+              </>
+            )}
+          </div>
+        );
+      }
+
+      ReactDOM.render(<App />, document.querySelector("#root"));
+    </script>
+  </body>
+</html>
