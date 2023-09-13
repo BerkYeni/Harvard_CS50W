@@ -14,6 +14,11 @@ bid_amount_field = fs.FloatField(
     })
   )
 
+category_field = fs.ChoiceField(
+  choices=Auction.Category.choices,
+
+)
+
 # def bid_amount_field(attrs) -> list:
 #   return fs.FloatField(
 #     label='',
@@ -36,6 +41,8 @@ class AuctionForm(fs.Form):
     max_length=64,
     widget=fs.TextInput(attrs={'placeholder': 'Title'})
   )
+
+  category = category_field
 
   description = fs.CharField(
     label='', 

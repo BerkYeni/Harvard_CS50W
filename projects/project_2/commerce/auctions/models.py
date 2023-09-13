@@ -1,13 +1,19 @@
-from django.db import models
+from django.db import models as ms
 from django.contrib.auth.models import AbstractUser
-
-ms = models
+from django.utils.translation import gettext_lazy
 
 
 class User(AbstractUser):
   pass
 
+
 class Auction(ms.Model):
+  class Category(ms.TextChoices):
+    other = "OT", "Other"
+    electronics = "EL", "Electronics"
+    fashion = "FA", "Fashion"
+    art = "AR", "Art"
+
   title = ms.CharField(max_length=64)
   description = ms.CharField(max_length=2048)
   date = ms.DateTimeField()
@@ -16,13 +22,11 @@ class Auction(ms.Model):
   )
   starting_bid = ms.FloatField()
   picture_url = ms.URLField(max_length=128)
-
-#   bids = ms.ForeignKey(
-#     Bid, on_delete=ms.CASCADE, related_name="auction_bids"
-#   )
-#   comments = ms.ForeignKey(
-#     Comment, on_delete=ms.CASCADE, related_name="auction_comments"
-#   )
+  category = ms.CharField(
+    max_length=2,
+    choices=Category.choices,
+    default=Category.other,
+  )
 
 
 class Comment(ms.Model):

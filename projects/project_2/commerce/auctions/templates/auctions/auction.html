@@ -1,52 +1,48 @@
-{% extends "auctions/layout.html" %}
+{% extends "auctions/layout.html" %} {% block body %}
+<img src="{{ auction.picture_url }}" alt="" />
+<h1>{{ auction.title }}</h1>
+<div>Category: {{ category }}</div>
+<div>{{ auction.description }}</div>
+<div>Auction holder: {{ auction.holder }}</div>
 
-{% block body %}
-  <img src="{{ auction.picture_url }}" alt="">
-  <h1>{{ auction.title }}</h1>
-  <div>{{ auction.description }}</div>
-  <div>Auction holder: {{ auction.holder }}</div>
+<div>Starting bid: {{ auction.starting_bid }}</div>
 
-  <div>Starting bid: {{ auction.starting_bid }}</div>
+{% if user.is_authenticated %}
+<form action="" method="post">
+  {% csrf_token %} {{ bid_form }}
+  <input type="submit" value="Bid" />
+</form>
+{% else %}
+<div>Log in to bid.</div>
+{% endif %} {% if user.is_authenticated %}
+<form action="" method="post">
+  {% csrf_token %} {{ comment_form }}
+  <input type="submit" value="Comment" />
+</form>
+{% else %}
+<div>Log in to comment.</div>
+{% endif %}
 
-  {% if user.is_authenticated %}
-    <form action="" method="post">
-      {% csrf_token %}
-      {{ bid_form }}
-      <input type="submit" value="Bid">
-    </form>
-  {% else %}
-    <div>Log in to bid.</div>
-  {% endif %}
-  {% if user.is_authenticated %}
-    <form action="" method="post">
-      {% csrf_token %}
-      {{ comment_form }}
-      <input type="submit" value="Comment">
-    </form>
-  {% else %}
-    <div>Log in to comment.</div>
-  {% endif %}
-
-  <h2>Current Bids:</h2>
-  <ul>
-    {% for bid in bids %}
-      <li>
-        <div>{{ bid.user }}</div>
-        <div>{{ bid.amount }}</div>
-      </li>
-    {% empty %}
-      <li>No bids yet.</li>
-    {% endfor %}
-  </ul>
-  <h2>Comments</h2>
-  <ul>
-    {% for comment in comments %}
-      <li>
-        <div>{{ comment.user }}</div>
-        <div>{{ comment.content }}</div>
-      </li>
-    {% empty %}
-      <li>No comments yet.</li>
-    {% endfor %}
-  </ul>
+<h2>Current Bids:</h2>
+<ul>
+  {% for bid in bids %}
+  <li>
+    <div>{{ bid.user }}</div>
+    <div>{{ bid.amount }}</div>
+  </li>
+  {% empty %}
+  <li>No bids yet.</li>
+  {% endfor %}
+</ul>
+<h2>Comments</h2>
+<ul>
+  {% for comment in comments %}
+  <li>
+    <div>{{ comment.user }}</div>
+    <div>{{ comment.content }}</div>
+  </li>
+  {% empty %}
+  <li>No comments yet.</li>
+  {% endfor %}
+</ul>
 {% endblock %}

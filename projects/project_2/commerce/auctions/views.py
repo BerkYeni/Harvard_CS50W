@@ -33,7 +33,7 @@ def login_view(request):
     password = request.POST["password"]
     user = authenticate(request, username=username, password=password)
 
-    # Check if authentication successful
+    # Check if authentication is successful
     if user is not None:
       login(request, user)
       return HttpResponseRedirect(reverse("index"))
@@ -55,10 +55,10 @@ def register(request):
     username = request.POST["username"]
     email = request.POST["email"]
 
-    # Ensure password matches confirmation
+    # Ensure password matches password confirmation
     password = request.POST["password"]
-    confirmation = request.POST["confirmation"]
-    if password != confirmation:
+    password_confirmation = request.POST["confirmation"]
+    if password != password_confirmation:
       return render(request, "auctions/register.html", {
           "message": "Passwords must match.",
       })
@@ -111,13 +111,20 @@ def auction(request, auction_title):
       return HttpResponseRedirect(auction_url(auction_title))
     else:
       return HttpResponseRedirect(reverse("no_auction"))
+
+  print(auction.Category.art.label)
+  test = Auction.Category(auction.category)
+  print(test.label)
   
   bids = auction.auction_bids.all()
   comments = auction.auction_comments.all()
   bid_form = BidForm()
   comment_form = CommentForm()
+  category = Auction.Category(auction.category).label
+  print(Auction.Category.choices)
   return render(request, "auctions/auction.html", {
     "auction": auction,
+    "category": category,
     "bids": bids,
     "comments": comments,
     "bid_form": bid_form,
@@ -142,6 +149,7 @@ def new_auction_view(request):
       holder=request.user,
       starting_bid=data["starting_bid"],
       picture_url=data["picture_url"],
+      category=data["category"],
     )
     auction.save()
     return HttpResponseRedirect(auction_url(auction.title))
