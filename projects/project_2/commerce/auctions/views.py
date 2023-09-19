@@ -158,3 +158,22 @@ def new_auction_view(request):
   return render(request, "auctions/new_auction.html", {
     "auction_form": auction_form
   })
+
+def categories(request):
+  categories_list = []
+  # put "other" category to end for visual purposes
+  category_choices = Auction.Category.choices
+  choice_other_index = category_choices.index(
+    list(filter(lambda choice: choice[0] == Auction.Category.other, category_choices))[0]
+  )
+  choice_other = category_choices.pop(choice_other_index)
+  category_choices.append(choice_other)
+
+  for category, label in category_choices:
+    auctions = Auction.objects.filter(category=category)
+    categories_list.append({"name": label, "auctions": auctions})
+
+
+  return render(request, "auctions/categories.html", {
+    "categoriesList": categories_list,
+  })
