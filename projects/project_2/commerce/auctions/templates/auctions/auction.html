@@ -5,19 +5,27 @@
 <div>{{ auction.description }}</div>
 <div>Auction holder: {{ auction.holder }}</div>
 
+{% if user.is_authenticated %}
+<form action="" method="post">
+  {% csrf_token %}
+  <input type="hidden" name="auctionTitle" value="{{ auction.title }}" />
+  <input type="submit" name="watchlist" value="Add to Watchlist" />
+</form>
+{% endif %}
+
 <div>Starting bid: {{ auction.starting_bid }}</div>
 
 {% if user.is_authenticated %}
 <form action="" method="post">
   {% csrf_token %} {{ bid_form }}
-  <input type="submit" value="Bid" />
+  <input type="submit" name="bid" value="Bid" />
 </form>
 {% else %}
 <div>Log in to bid.</div>
 {% endif %} {% if user.is_authenticated %}
 <form action="" method="post">
   {% csrf_token %} {{ comment_form }}
-  <input type="submit" value="Comment" />
+  <input type="submit" name="comment" value="Comment" />
 </form>
 {% else %}
 <div>Log in to comment.</div>

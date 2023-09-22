@@ -3,9 +3,6 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy
 
 
-class User(AbstractUser):
-  pass
-
 
 class Auction(ms.Model):
   class Category(ms.TextChoices):
@@ -18,7 +15,7 @@ class Auction(ms.Model):
   description = ms.CharField(max_length=2048)
   date = ms.DateTimeField()
   holder = ms.ForeignKey(
-    User, on_delete=ms.CASCADE, related_name="user_auctions"
+    "User", on_delete=ms.CASCADE, related_name="user_auctions"
   )
   starting_bid = ms.FloatField()
   picture_url = ms.URLField(max_length=128)
@@ -27,6 +24,9 @@ class Auction(ms.Model):
     choices=Category.choices,
     default=Category.other,
   )
+
+class User(AbstractUser):
+  watchlist = ms.ManyToManyField(Auction)
 
 
 class Comment(ms.Model):

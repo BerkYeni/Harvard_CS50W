@@ -87,9 +87,12 @@ def auction(request, auction_title):
     if not request.user.is_authenticated:
       return HttpResponseRedirect(reverse("login"))
 
-    bid_form = BidForm(request.POST)
-    comment_form = CommentForm(request.POST)
-    if bid_form.is_valid():
+    # bid_form = BidForm(request.POST)
+    # if bid_form.is_valid():
+    if "bid" in request.POST:
+      bid_form = BidForm(request.POST)
+      if not bid_form.is_valid():
+        return render(request, "auctions/no_auction.html")
       if bid_form.cleaned_data["amount"] < auction.starting_bid:
         return HttpResponseRedirect(auction_url(auction.title))
       current_bid = Bid(
@@ -100,28 +103,36 @@ def auction(request, auction_title):
       )
       current_bid.save()
       return HttpResponseRedirect(auction_url(auction_title))
-    elif comment_form.is_valid():
+
+    if "comment" in request.POST:
+    # if comment_form.is_valid():
+      comment_form = CommentForm(request.POST)
+      if not comment_form.is_valid():
+        return render(request, "auctions/no_auction.html")
       comment = Comment(
         content=comment_form.cleaned_data["content"],
         date=datetime.now(),
         comment_auction=auction,
-        user=request.user
+        user=request.user,
       )
       comment.save()
       return HttpResponseRedirect(auction_url(auction_title))
-    else:
-      return HttpResponseRedirect(reverse("no_auction"))
 
-  print(auction.Category.art.label)
+    if "watchlist" in request.POST:
+      toBeWatchlistedTitle = request.POST["auctionTitle"]
+      auction = Auction.objects.get(title=toBeWatchlistedTitle)
+      request.user.watchlist.add(auction)
+      return HttpResponseRedirect(auction_url(auction_title))
+
+    return HttpResponseRedirect(reverse("no_auction"))
+
   test = Auction.Category(auction.category)
-  print(test.label)
   
   bids = auction.auction_bids.all()
   comments = auction.auction_comments.all()
   bid_form = BidForm()
   comment_form = CommentForm()
   category = Auction.Category(auction.category).label
-  print(Auction.Category.choices)
   return render(request, "auctions/auction.html", {
     "auction": auction,
     "category": category,
@@ -137,6 +148,7 @@ def no_auction(request):
 def new_auction_view(request):
   if not request.user.is_authenticated:
     return HttpResponseRedirect(reverse("login"))
+
   if request.method == "POST":
     auction_form = AuctionForm(request.POST)
     if not auction_form.is_valid():
@@ -173,7 +185,16 @@ def categories(request):
     auctions = Auction.objects.filter(category=category)
     categories_list.append({"name": label, "auctions": auctions})
 
-
   return render(request, "auctions/categories.html", {
     "categoriesList": categories_list,
+  })
+
+def watchlist(request):
+  if not request.user.is_authenticated:
+    return HttpResponseRedirect(reverse("login"))
+
+  watched_auctions = request.user.watchlist.all()
+
+  return render(request, "auctions/watchlist.html", {
+    "watched_auctions": watched_auctions,
   })
