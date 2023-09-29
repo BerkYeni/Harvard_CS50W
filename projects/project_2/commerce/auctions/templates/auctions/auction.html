@@ -7,9 +7,15 @@
 
 {% if user.is_authenticated %}
 <form action="" method="post">
-  {% csrf_token %}
-  <input type="hidden" name="auctionTitle" value="{{ auction.title }}" />
+  {% csrf_token %} {% if is_in_watchlist %}
+  <input
+    type="submit"
+    name="remove_from_wathclist"
+    value="Remove from Watchlist"
+  />
+  {% else %}
   <input type="submit" name="watchlist" value="Add to Watchlist" />
+  {% endif %}
 </form>
 {% endif %}
 

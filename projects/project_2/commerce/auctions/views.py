@@ -119,15 +119,25 @@ def auction(request, auction_title):
       return HttpResponseRedirect(auction_url(auction_title))
 
     if "watchlist" in request.POST:
-      toBeWatchlistedTitle = request.POST["auctionTitle"]
-      auction = Auction.objects.get(title=toBeWatchlistedTitle)
+      # toBeWatchlistedTitle = request.POST["auctionTitle"]
+      # auction = Auction.objects.get(title=toBeWatchlistedTitle)
       request.user.watchlist.add(auction)
+      return HttpResponseRedirect(auction_url(auction_title))
+
+    if "remove_from_wathclist" in request.POST:
+      # toBeRemovedTitle = request.POST["auctionTitle"]
+      # auction = Auction.objects.get(title=toBeWatchlistedTitle)
+      request.user.watchlist.remove(auction)
       return HttpResponseRedirect(auction_url(auction_title))
 
     return HttpResponseRedirect(reverse("no_auction"))
 
-  test = Auction.Category(auction.category)
-  
+
+  is_in_watchlist = False
+  if request.user.is_authenticated:
+    # reverse look up for many to many relationship works like below
+    is_in_watchlist = bool(Auction.objects.filter(user__username=request.user.username, title=auction_title))
+
   bids = auction.auction_bids.all()
   comments = auction.auction_comments.all()
   bid_form = BidForm()
@@ -140,6 +150,7 @@ def auction(request, auction_title):
     "comments": comments,
     "bid_form": bid_form,
     "comment_form": comment_form,
+    "is_in_watchlist": is_in_watchlist,
   })
 
 def no_auction(request):
