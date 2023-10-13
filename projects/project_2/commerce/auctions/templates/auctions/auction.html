@@ -1,5 +1,5 @@
 {% extends "auctions/layout.html" %} {% block body %}
-<img src="{{ auction.picture_url }}" alt="" />
+<img style="max-width: 50%" src="{{ auction.picture_url }}" alt="" />
 <h1>{{ auction.title }}</h1>
 <div>Category: {{ category }}</div>
 <div>{{ auction.description }}</div>
@@ -38,6 +38,17 @@
 {% endif %}
 
 <h2>Current Bids:</h2>
+{% if user_owns_auction and user.is_authenticated %}
+<form action="" method="post">
+  {% csrf_token %}
+  <input
+    type="submit"
+    name="sell_to_highest_bidder"
+    value="Sell for the highest bidder"
+    {% if not bids_exist %} disabled {% endif %}
+  />
+</form>
+{% endif %}
 <ul>
   {% for bid in bids %}
   <li>

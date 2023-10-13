@@ -24,6 +24,8 @@ class Auction(ms.Model):
     choices=Category.choices,
     default=Category.other,
   )
+  is_closed = ms.BooleanField(default=False)
+  sold_to = ms.ForeignKey("User", on_delete=ms.CASCADE, related_name="auctions_sold_to_user", null=True, blank=True)
 
 class User(AbstractUser):
   watchlist = ms.ManyToManyField(Auction)

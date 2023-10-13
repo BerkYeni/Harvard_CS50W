@@ -119,24 +119,32 @@ def auction(request, auction_title):
       return HttpResponseRedirect(auction_url(auction_title))
 
     if "watchlist" in request.POST:
-      # toBeWatchlistedTitle = request.POST["auctionTitle"]
-      # auction = Auction.objects.get(title=toBeWatchlistedTitle)
       request.user.watchlist.add(auction)
       return HttpResponseRedirect(auction_url(auction_title))
 
     if "remove_from_wathclist" in request.POST:
-      # toBeRemovedTitle = request.POST["auctionTitle"]
-      # auction = Auction.objects.get(title=toBeWatchlistedTitle)
       request.user.watchlist.remove(auction)
       return HttpResponseRedirect(auction_url(auction_title))
+
+    if "sell_to_highest_bidder" in request.POST:
+      bids = auction.auction_bids.all()
+      if (not len(bids)):
+        # this should not happen cuz it should be disabled
+        return HttpResponseRedirect(reverse("index"))
+      bid_list = list(bids)
+      bid_list.sort(key=lambda bid: bid.amount)
+      highest_bid = bid_list[0]
+      print(highest_bid)
 
     return HttpResponseRedirect(reverse("no_auction"))
 
 
+  user_owns_auction = False
   is_in_watchlist = False
   if request.user.is_authenticated:
     # reverse look up for many to many relationship works like below
     is_in_watchlist = bool(Auction.objects.filter(user__username=request.user.username, title=auction_title))
+    user_owns_auction = auction.holder == request.user
 
   bids = auction.auction_bids.all()
   comments = auction.auction_comments.all()
@@ -151,6 +159,8 @@ def auction(request, auction_title):
     "bid_form": bid_form,
     "comment_form": comment_form,
     "is_in_watchlist": is_in_watchlist,
+    "user_owns_auction": user_owns_auction,
+    "bids_exist": bool(len(bids))
   })
 
 def no_auction(request):
