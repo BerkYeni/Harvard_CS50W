@@ -5,60 +5,81 @@
 <div>{{ auction.description }}</div>
 <div>Auction holder: {{ auction.holder }}</div>
 
-{% if user.is_authenticated %}
-<form action="" method="post">
-  {% csrf_token %} {% if is_in_watchlist %}
-  <input
-    type="submit"
-    name="remove_from_wathclist"
-    value="Remove from Watchlist"
-  />
-  {% else %}
-  <input type="submit" name="watchlist" value="Add to Watchlist" />
+{% if not auction.taken_bid %}
+  {% if user.is_authenticated %}
+  <form action="" method="post">
+    {% csrf_token %} {% if is_in_watchlist %}
+    <input
+      type="submit"
+      name="remove_from_wathclist"
+      value="Remove from Watchlist"
+    />
+    {% else %}
+    <input type="submit" name="watchlist" value="Add to Watchlist" />
+    {% endif %}
+  </form>
   {% endif %}
-</form>
+
+  <div>Starting bid: {{ auction.starting_bid }}</div>
+
+  {% if user.is_authenticated %}
+    {% if not user_owns_auction %}
+      <form action="" method="post">
+        {% csrf_token %} {{ bid_form }}
+        <input type="submit" name="bid" value="Bid" />
+      </form>
+    {% endif %}
+  {% else %}
+  <div>Log in to bid.</div>
+  {% endif %}
+
+{% else %}
+  <h2>Auction is closed.</h2>
+
 {% endif %}
 
-<div>Starting bid: {{ auction.starting_bid }}</div>
+
+{% if not auction.taken_bid %}
+  <h2>Current Bids:</h2>
+  {% if user_owns_auction and user.is_authenticated %}
+  <form action="" method="post">
+    {% csrf_token %}
+    <input
+      type="submit"
+      name="sell_to_highest_bidder"
+      value="Sell for the highest bidder"
+      {% if not bids_exist %} disabled {% endif %}
+    />
+  </form>
+  {% endif %}
+  <ul>
+    {% for bid in bids %}
+    <li>
+      <div>{{ bid.user }}</div>
+      <div>{{ bid.amount }}</div>
+    </li>
+    {% empty %}
+    <li>No bids yet.</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <div>Auction was sold to <strong>{{auction.taken_bid.user}}</strong></div>
+  <div>Selling bid was <strong>{{auction.taken_bid.amount}}</strong></div>
+
+{% endif %}
+
+<hr>
 
 {% if user.is_authenticated %}
 <form action="" method="post">
-  {% csrf_token %} {{ bid_form }}
-  <input type="submit" name="bid" value="Bid" />
-</form>
-{% else %}
-<div>Log in to bid.</div>
-{% endif %} {% if user.is_authenticated %}
-<form action="" method="post">
   {% csrf_token %} {{ comment_form }}
-  <input type="submit" name="comment" value="Comment" />
+  <div><input type="submit" name="comment" value="Comment" /></div>
 </form>
 {% else %}
 <div>Log in to comment.</div>
 {% endif %}
 
-<h2>Current Bids:</h2>
-{% if user_owns_auction and user.is_authenticated %}
-<form action="" method="post">
-  {% csrf_token %}
-  <input
-    type="submit"
-    name="sell_to_highest_bidder"
-    value="Sell for the highest bidder"
-    {% if not bids_exist %} disabled {% endif %}
-  />
-</form>
-{% endif %}
-<ul>
-  {% for bid in bids %}
-  <li>
-    <div>{{ bid.user }}</div>
-    <div>{{ bid.amount }}</div>
-  </li>
-  {% empty %}
-  <li>No bids yet.</li>
-  {% endfor %}
-</ul>
+
 <h2>Comments</h2>
 <ul>
   {% for comment in comments %}

@@ -6,6 +6,22 @@
   <li>
     <h1><a href="auction/{{ auction.title }}">{{ auction.title }}</a></h1>
     <div>{{ auction.description }}</div>
+
+    {% if not auction.taken_bid %}
+      <div>Ongoing</div>
+    {% else %}
+      <div>Sold</div>
+    {% endif %}
+
+    <form action="" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="auction_title" value="{{auction.title}}" >
+      <input
+        type="submit"
+        name="remove_from_wathclist"
+        value="Remove from Watchlist"
+      />
+    </form>
   </li>
   {% empty %}
   <div>No watched auctions.</div>

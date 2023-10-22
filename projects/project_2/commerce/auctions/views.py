@@ -13,9 +13,6 @@ from .models import User, Bid, Comment, Auction
 # TODO: fixed auction image size
 # TODO: in new auction, if no url is provided, display a default img
 
-def auction_url(auction_title):
-  return f"{reverse('index')}auction/{auction_title}"
-
 
 def index(request):
   auctions = Auction.objects.all()
@@ -87,35 +84,29 @@ def auction(request, auction_title):
     if not request.user.is_authenticated:
       return HttpResponseRedirect(reverse("login"))
 
-    # bid_form = BidForm(request.POST)
-    # if bid_form.is_valid():
     if "bid" in request.POST:
       bid_form = BidForm(request.POST)
       if not bid_form.is_valid():
         return render(request, "auctions/no_auction.html")
-      if bid_form.cleaned_data["amount"] < auction.starting_bid:
-        return HttpResponseRedirect(auction_url(auction.title))
-      current_bid = Bid(
-        amount=bid_form.cleaned_data["amount"], 
-        bid_auction=auction,
-        date=datetime.now(),
-        user=request.user,
-      )
-      current_bid.save()
+
+      amount = bid_form.cleaned_data["amount"]
+
+      try:
+        bid_on_auction(user=request.user, auction=auction, amount=amount)
+
+      except Bid.MultipleObjectsReturned:
+        return render(request, "auctions/no_auction.html")
+      except TooSmallBidAmount:
+        return HttpResponseRedirect(auction_url(auction_title))
+
       return HttpResponseRedirect(auction_url(auction_title))
 
+
     if "comment" in request.POST:
-    # if comment_form.is_valid():
       comment_form = CommentForm(request.POST)
       if not comment_form.is_valid():
         return render(request, "auctions/no_auction.html")
-      comment = Comment(
-        content=comment_form.cleaned_data["content"],
-        date=datetime.now(),
-        comment_auction=auction,
-        user=request.user,
-      )
-      comment.save()
+      comment_on_auction(user=request.user, auction=auction, content=comment_form.cleaned_data["content"])
       return HttpResponseRedirect(auction_url(auction_title))
 
     if "watchlist" in request.POST:
@@ -127,14 +118,12 @@ def auction(request, auction_title):
       return HttpResponseRedirect(auction_url(auction_title))
 
     if "sell_to_highest_bidder" in request.POST:
-      bids = auction.auction_bids.all()
-      if (not len(bids)):
-        # this should not happen cuz it should be disabled
-        return HttpResponseRedirect(reverse("index"))
-      bid_list = list(bids)
-      bid_list.sort(key=lambda bid: bid.amount)
-      highest_bid = bid_list[0]
-      print(highest_bid)
+      try:
+        sell_auction_to_highest_bidder(auction=auction)
+      except NoBids:
+        return HttpResponseRedirect(reverse("no_auction"))
+
+      return HttpResponseRedirect(auction_url(auction_title))
 
     return HttpResponseRedirect(reverse("no_auction"))
 
@@ -146,7 +135,7 @@ def auction(request, auction_title):
     is_in_watchlist = bool(Auction.objects.filter(user__username=request.user.username, title=auction_title))
     user_owns_auction = auction.holder == request.user
 
-  bids = auction.auction_bids.all()
+  bids = sorted(auction.auction_bids.all(), key= lambda bid: bid.amount, reverse=True)
   comments = auction.auction_comments.all()
   bid_form = BidForm()
   comment_form = CommentForm()
@@ -214,8 +203,85 @@ def watchlist(request):
   if not request.user.is_authenticated:
     return HttpResponseRedirect(reverse("login"))
 
+  if request.method == "POST":
+    if "remove_from_wathclist" in request.POST:
+      print(request.POST["remove_from_wathclist"])
+      try:
+        auction = Auction.objects.get(title=request.POST["auction_title"])
+      except:
+        return HttpResponseRedirect(reverse("no_auction"))
+
+      request.user.watchlist.remove(auction)
+      return HttpResponseRedirect(reverse("watchlist"))
+
+    return HttpResponseRedirect(reverse("no_auction"))
+
+
   watched_auctions = request.user.watchlist.all()
 
   return render(request, "auctions/watchlist.html", {
     "watched_auctions": watched_auctions,
   })
+
+
+def auction_url(auction_title):
+  return f"{reverse('index')}auction/{auction_title}"
+
+class TooSmallBidAmount(Exception):
+  pass
+class NoBids(Exception):
+  pass
+
+def bid_on_auction(user, auction, amount):
+  if amount < auction.starting_bid:
+    raise TooSmallBidAmount
+  if len(auction.auction_bids.all()) > 0:
+    highest_bid = max(auction.auction_bids.all(), key= lambda bid: bid.amount).amount
+    if amount <= highest_bid:
+      raise TooSmallBidAmount
+
+
+  existing_bid = None
+  try:
+    existing_bid = Bid.objects.get(user=user, bid_auction=auction)
+
+  except Bid.DoesNotExist:
+    pass
+
+  except Bid.MultipleObjectsReturned:
+    # should not happen
+    raise Bid.MultipleObjectsReturned
+
+  if not existing_bid:
+    current_bid = Bid(
+      amount=amount, 
+      bid_auction=auction,
+      date=datetime.now(),
+      user=user,
+    )
+    current_bid.save()
+    return
+
+  existing_bid.amount = amount
+  existing_bid.save()
+
+
+def comment_on_auction(user, auction, content):
+  comment = Comment(
+    content=content,
+    date=datetime.now(),
+    comment_auction=auction,
+    user=user,
+  )
+  comment.save()
+
+def sell_auction_to_highest_bidder(auction):
+  bids = auction.auction_bids.all()
+  if (not len(bids)):
+    # this should not happen cuz it should be disabled
+    raise NoBids
+  bid_list = sorted(list(bids), key=lambda bid: bid.amount)
+  # bid_list.sort(key=lambda bid: bid.amount)
+  highest_bid = bid_list[-1]
+  auction.taken_bid = highest_bid
+  auction.save()

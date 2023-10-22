@@ -6,8 +6,15 @@
   <ul>
     {% for auction in auctions %}
     <li>
+      <img src="{{ auction.picture_url }}" alt="picture" style="max-width: 20%;">
       <h1><a href="auction/{{ auction.title }}">{{ auction.title }}</a></h1>
+      By <strong>{{ auction.holder }}</strong>
       <div>{{ auction.description }}</div>
+      {% if not auction.taken_bid %}
+        <div>Ongoing</div>
+      {% else %}
+        <div>Sold</div>
+      {% endif %}
     </li>
     {% empty %}
       <li>
