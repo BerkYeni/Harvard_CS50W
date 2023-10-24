@@ -1,0 +1,28 @@
+textarea {
+  min-height: 400px;
+}
+
+li {
+  list-style-type: none;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.emailOverview {
+  display: grid;
+  grid-template-columns: 6fr 2fr 2fr;
+}
+
+.emailSubjectOverview {
+  padding-right: 10px;
+  cursor: pointer;
+}
+
+.emailDateOverview {
+  justify-self: right;
+}
+
+.read {
+  background-color: gainsboro;
+}
